@@ -1,45 +1,32 @@
 package main
 
 import (
-	"cmp"
 	"context"
 	"github.com/iTchTheRightSpot/utility/middleware"
 	"github.com/iTchTheRightSpot/utility/utils"
 	"github.com/rs/cors"
-	"log"
+	"github.com/syumai/workers/cloudflare"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/syumai/workers"
 )
 
 func main() {
-	ui := cmp.Or(os.Getenv("FRONTEND"), "http://localhost:4200")
-	discord := cmp.Or(os.Getenv("DISCORD"), "private-channel-webhook")
-
-	lg := utils.DevLogger("UTC")
-	if discord != "private-channel-webhook" {
-		if strings.Contains(ui, "localhost") {
-			lg.Fatal("please set frontend url")
-		}
-		lg = utils.ProdLogger(time.RFC3339, "UTC", discord)
-	}
+	//ui := cmp.Or(os.Getenv("FRONTEND"), "http://localhost:4200")
+	//discord := cmp.Or(os.Getenv("DISCORD"), "private-channel-webhook")
+	ui := cloudflare.Getenv("MY_ENV")
+	lg := utils.ProdLogger(time.RFC3339, "UTC", cloudflare.Getenv("DISCORD"))
 
 	m := middleware.Middleware{Logger: lg}
 
 	han := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
-		log.Printf("frontend url " + ui)
-		log.Printf("logg name param " + name)
-		lg.Log(r.Context(), "log impl frontend url "+ui)
-		lg.Log(r.Context(), "log impl name param "+name)
 		if name == "" {
 			utils.ErrorResponse(w, &utils.BadRequestError{})
 			return
 		}
-		lg.Log(r.Context(), name+" is visiting your portfolio")
+		lg.Log(r.Context(), name+" is visiting your portfolio", "frontend "+ui)
 		w.WriteHeader(204)
 	})
 
