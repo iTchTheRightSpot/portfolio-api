@@ -5,5 +5,9 @@
   "compatibility_date": "2025-04-08",
   "build": {
     "command": "npm run build"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
   }
 }
