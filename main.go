@@ -6,6 +6,7 @@ import (
 	"github.com/iTchTheRightSpot/utility/middleware"
 	"github.com/iTchTheRightSpot/utility/utils"
 	"github.com/rs/cors"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -30,6 +31,10 @@ func main() {
 
 	han := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		name := r.URL.Query().Get("name")
+		log.Printf("frontend url " + ui)
+		log.Printf("logg name param " + name)
+		lg.Log(r.Context(), "log impl frontend url "+ui)
+		lg.Log(r.Context(), "log impl name param "+name)
 		if name == "" {
 			utils.ErrorResponse(w, &utils.BadRequestError{})
 			return
