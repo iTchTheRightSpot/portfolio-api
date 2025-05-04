@@ -27,10 +27,9 @@ func main() {
 	}
 
 	m := middleware.Middleware{Logger: lg}
-	mux := http.NewServeMux()
 
-	mux.HandleFunc("POST /api/{name}", func(w http.ResponseWriter, r *http.Request) {
-		name := r.PathValue("name")
+	han := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		name := r.URL.Query().Get("name")
 		if name == "" {
 			utils.ErrorResponse(w, &utils.BadRequestError{})
 			return
@@ -48,5 +47,5 @@ func main() {
 	})
 
 	lg.Log(context.Background(), "server listening on default port 9900")
-	workers.Serve(m.Log(c.Handler(m.Panic(mux))))
+	workers.Serve(m.Log(c.Handler(m.Panic(han))))
 }
