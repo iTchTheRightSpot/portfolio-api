@@ -15,7 +15,7 @@ import (
 func main() {
 	//ui := cmp.Or(os.Getenv("FRONTEND"), "http://localhost:4200")
 	//discord := cmp.Or(os.Getenv("DISCORD"), "private-channel-webhook")
-	ui := cloudflare.Getenv("MY_ENV")
+	ui := cloudflare.Getenv("FRONTEND")
 	lg := utils.ProdLogger(time.RFC3339, "UTC", cloudflare.Getenv("DISCORD"))
 
 	m := middleware.Middleware{Logger: lg}
