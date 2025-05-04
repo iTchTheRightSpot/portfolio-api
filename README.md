@@ -42,3 +42,6 @@ npm run deploy # deploy worker
 $ curl http://localhost:8787
 Hello, Go!
 ```
+
+### Development docs
+[link](https://developers.cloudflare.com/pages/configuration/build-image/)
