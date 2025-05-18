@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/iTchTheRightSpot/utility/utils"
 	"github.com/rs/cors"
 	"github.com/syumai/workers"
 	"github.com/syumai/workers/cloudflare"
@@ -13,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"errors"
 )
 
 var vs = fetch.NewClient()
@@ -69,10 +69,10 @@ func emit(body io.Reader) error {
 	if err != nil {
 		return err
 	}
-
+	
 	defer func(b io.ReadCloser) { err = b.Close() }(res.Body)
-
-	return &utils.ServerError{Message: string(byts)}
+	err = errors.New(string(byts))
+	return err
 }
 
 func add(r *http.Request) string {
@@ -107,23 +107,22 @@ func main() {
 					fmt.Println(err.Error())
 				}
 			}
-			utils.ErrorResponse(w, &utils.BadRequestError{})
+			w.WriteHeader(400)
 			return
 		}
 
 		if i, err := serialize(b); err != nil {
 			fmt.Println(err.Error())
-			utils.ErrorResponse(w, &utils.ServerError{})
+			w.WriteHeader(500)
 		} else {
 			b.Info = name + " is visiting"
 			if err = emit(i); err != nil {
 				fmt.Println(err.Error())
-				utils.ErrorResponse(w, &utils.ServerError{})
+				w.WriteHeader(500)
 				return
 			}
+			w.WriteHeader(204)
 		}
-
-		w.WriteHeader(204)
 	})
 
 	c := cors.New(cors.Options{
@@ -131,7 +130,7 @@ func main() {
 		AllowedMethods:   []string{http.MethodPost},
 		AllowedHeaders:   []string{"Origin", "Content-Type", "Accept"},
 		ExposedHeaders:   []string{"Content-Length"},
-		AllowCredentials: true,
+		// AllowCredentials: true,
 	})
 
 	fmt.Println("server listening on default port 9900")
